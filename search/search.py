@@ -214,8 +214,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     # In order for this to be a proper stack you can only interact with it as a .append() or .pop()
     # {If we are using straight Py list}
 
-    fringe.push((problem.getStartState(), [], 0), 0)  # Adds the start state and a list which will be the path
+    startState = problem.getStartState() # Need to store start state separately now, since we need to use it twice
+
+    fringe.push((startState, [], 0), 0)  # Adds the start state and a list which will be the path
     # Added a third position to hold the Cost of the first item, and a second item to hold the priority level
+
+    heuristic(startState, problem) # f(n) = g(n) + h(n)
+    # Holds the data that will be used by the heursitic calculations
 
     # Needs to be filled with the directions maybe? Instead of the nodes themselves.
     explored = []  # Explored nodes, starts as empty, will end up with all explored nodes.
@@ -235,8 +240,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             for successor, actionFromCurrStateToNextState, stepCost in problem.getSuccessors(node):
                 if successor not in explored:  # DFS does not want to revisit states.
                     new_path = path + [actionFromCurrStateToNextState]  # Updates the path to the new successor
-                    new_cost = cost + stepCost
-                    fringe.push((successor, new_path, new_cost), new_cost)  # Sends the path with the successor into the fringe.
+                    new_cost = cost + stepCost # Updates the cost to kick to next nodes
+                    priority = new_cost + heuristic(successor, problem) # Gets the priority value that each item should get (f(n) = g(n) + h(n))
+                    fringe.push((successor, new_path, new_cost), priority)  # Sends the path with the successor into the fringe.
     # Fringe is empty, meaning they have explored every node and not found the correct one.
     return []  # Added list to return correct datatype.
 
